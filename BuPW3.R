@@ -2,6 +2,7 @@
 #sorting git 
 #fixed error using "git config --global http.postBuffer 524288000" - ask
 
+#1. Conceptualisation
 #installing raster
 install.packages("raster",dependencies=TRUE,repos="https://cloud.r-project.org")
 library(raster)
@@ -12,6 +13,7 @@ install.packages("geodata",dependencies=TRUE,repos="https://cloud.r-project.org"
 library(geodata)
 library(terra)
 
+#2. Data preparation
 #loading data
 avi_dat <- read.table('Data_SwissBreedingBirds.csv', header=T, sep=',')
 
@@ -56,3 +58,6 @@ bio_fut <- terra::mask(bio_fut, bg)
 
 names(bio_curr) <- c('bio_2', 'bio_5', 'bio_14')
 names(bio_fut) <- c('bio_2', 'bio_5', 'bio_14')
+
+#plot the current climate variables and how they are projected to change over time
+plot(bio_curr)
