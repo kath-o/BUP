@@ -60,7 +60,7 @@ names(predictors)<-substring(names(predictors),11,16)
 plot(predictors,1:9)
 
 #and here we can add our species data onto a plot of climate data for the first variable.
-plot(predictors,1)
+plot(predictors,19)
 points(occ$lon,occ$lat, col='maroon2',pch=16,cex=0.2)
 
 #generating background data
@@ -140,3 +140,6 @@ bio_fut<-cmip6_world(model='ACCESS-ESM1-5', ssp='245', time='2041-2060', var='bi
 fut_predictors<-crop(bio_fut,e)
 
 plot(predictors,19)
+
+plot(fut_predictors,19)
+
