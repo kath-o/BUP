@@ -61,4 +61,4 @@ plot(predictors,1:9)
 
 #And here we can add our species data onto a plot of climate data for the first variable.
 plot(predictors,1)
-points(occ$lon,occ$lat, col='orange',pch=16,cex=0.2)
+points(occ$lon,occ$lat, col='maroon2',pch=16,cex=0.2)
