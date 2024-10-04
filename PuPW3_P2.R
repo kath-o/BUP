@@ -89,3 +89,4 @@ sdmdata <- data.frame(cbind(lonlats,pb, rbind(presvals, backvals)))
 #In sdmdata the first two columns are climate data and third column contains either a 1 (species present) or 0 (background data). The remaining columns are the corresponding worldclim variables for these location.
 
 #We can also examine how colinear (i.e. correlated) predictor variables are. Highly correlated predictor variables can give rise to statistical issues.
+pairs(sdmdata[,4:7], cex=0.1)
