@@ -171,4 +171,35 @@ bestthreshold<-thresholds[which.max(tpr+(1-fpr))]
 
 bestthreshold
 
+#5. prediction 
+#predict where might be suitable for ring ouzels now and in the future
+#four ingredients that we needs are (i) the model, (ii) the climate layers that we imported from worldclim and (iii) the predict function that we’ve already used and (iv) the threshold we identified
+#the current distribution
+bio_curr_df <- as.data.frame(bio_curr, xy = TRUE, na.rm = FALSE)
+
+bio_curr_df$pred_glm<-predict(model,bio_curr_df,type="response")
+
+# Make binary predictions:
+bio_curr_df$bin_glm <- ifelse(bio_curr_df$pred_glm > bestthreshold, 1, 0)
+
+#plot the current probability and predicted presence/absence.
+
+
+r_pred_curr <- rast(as.matrix(bio_curr_df[,-c(3:5)]),type="xyz")
+plot(r_pred_curr)
+
+#we’re not able to check how this predicted distribution compares with the raw data as there were no spatial coordinates in the raw data
+#next step is to plot the future distribution of ring ouzels. If you can try to amend the code above to do this.
+
+bio_fut_df <- as.data.frame(bio_fut, xy = TRUE, na.rm = FALSE)
+
+bio_fut_df$pred_glm<-predict(model,bio_fut_df,type="response")
+
+# Make binary predictions:
+bio_fut_df$bin_glm <- ifelse(bio_fut_df$pred_glm > bestthreshold, 1, 0)
+
+#plot the current probability and predicted presence/absence.
+
+r_pred_fut <- rast(as.matrix(bio_fut_df[,-c(3:5)]),type="xyz")
+plot(r_pred_fut)
 
