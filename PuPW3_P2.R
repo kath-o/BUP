@@ -25,3 +25,36 @@ wrld <- world(path="~/Desktop/MSc EEB/WD/BUP")
 plot(wrld, xlim=c(-180,180), ylim=c(-80,80), col="light yellow", border="light gray")
 # add the points
 points(occdata$lon, occdata$lat, col='blue', pch=20)
+
+#cleaning up occurrence data 
+#GBIF can have errors, needs to be scrutinised 
+#not necessary for this data, but if it was: 
+#occdata<-subset(occdata,lat>0)
+#dups <- duplicated(occdata[, c('lon', 'lat')])
+#This identifies observations that have already appeared above
+#sum(dups)
+#There are a lot of them, so removing them will give us a smaller dataset to work with
+#occ <- occdata[!dups, ]
+
+#downloading worldclim data 
+#download data at a resolution of 10 minutes (60 mins a degree)
+
+output_dir<-"~/Desktop/MSc EEB/WD/BUP/Data"
+
+bio_glob<-worldclim_global(var="bio", res=10,path=output_dir, version="2.1")
+
+dim(bio_glob)
+
+#bio_glob is in the form of a spatraster (i.e. spatial raster). A raster is simply another name for a spatial grid, and a spatraster combines several of these grids - one for each of the 19 worldclim variables
+#we will also clip the spatraster so it only covers the spatial extent of our study species. First its longitudes then latitudes
+summary(occ$lon)
+summary(occ$lat)
+
+e <- ext(-179, 174, 33, 80)
+
+predictors <- crop(bio_glob, e)
+
+names(predictors)<-substring(names(predictors),11,16)
+
+#We can now have a look at the global climate data. Here we’ll just look at the first 9 worldclim variables
+plot(predictors,1:9)
