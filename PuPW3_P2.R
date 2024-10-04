@@ -123,6 +123,7 @@ model<-MaxEnt(sdmdata[,-c(1:3)],sdmdata[,3],removeDuplicates=TRUE)
 #next we specify the presence/background data - column1 i.e. [,3]
 
 plot(model)
+model
 
 #We can look at the predicted climate suitability globally, and see how it matches where the species has been recorded (remember with occurrence data no data doesn’t mean it is necessarily absent).
 predictedocc <- predict(model, predictors, args=c("outputformat=raw")) 
@@ -139,7 +140,16 @@ bio_fut<-cmip6_world(model='ACCESS-ESM1-5', ssp='245', time='2041-2060', var='bi
 
 fut_predictors<-crop(bio_fut,e)
 
-plot(predictors,19)
+plot(predictors,17)
 
-plot(fut_predictors,19)
+plot(fut_predictors,17)
 
+#generate a prediction of future climate suitability for our species
+names(fut_predictors)<-names(predictors)
+
+fut_predictedocc <- predict(model, fut_predictors, args=c("outputformat=raw")) 
+
+par(mfrow=c(2,1))
+plot(predictedocc,main="current")
+
+plot(fut_predictedocc,main="2050")
