@@ -15,7 +15,7 @@ library(terra)
 
 #2. Data preparation
 #loading data
-avi_dat <- read.table('Data_SwissBreedingBirds.csv', header=T, sep=',')
+avi_dat <- read.table('~/Desktop/MSc EEB/WD/BUP/Data/Data_SwissBreedingBirds.csv', header=T, sep=',')
 
 nrow(avi_dat)
 
@@ -45,20 +45,26 @@ bg <- rast('/vsicurl/https://damariszurell.github.io/SDM-Intro/CH_mask.tif')
 
 bio_curr <- terra::project(bio_curr, bg)
 bio_fut <- terra::project(bio_fut, bg)
-#we need to change the projection of our climate data to match that of the bg file.
 
+#we need to change the projection of our climate data to match that of the bg file.
 bio_curr <- terra::resample(bio_curr, bg)
 bio_fut <- terra::resample(bio_fut, bg)
 
 #we then need to make the resolution equivalent to bg. 
-
-
 bio_curr <- terra::mask(bio_curr, bg)
 bio_fut <- terra::mask(bio_fut, bg)
-#we then need to clip the extent to match an outline of Switzerland
 
+
+#we then need to clip the extent to match an outline of Switzerland
 names(bio_curr) <- c('bio_2', 'bio_5', 'bio_14')
 names(bio_fut) <- c('bio_2', 'bio_5', 'bio_14')
 
 #plot the current climate variables and how they are projected to change over time
 plot(bio_curr)
+
+plot(bio_fut)
+
+#3. Model fitting 
+#can you code a binomial GLM with all three predictors fitted as linear and squared terms?
+
+
