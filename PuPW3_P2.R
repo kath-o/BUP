@@ -97,7 +97,6 @@ pairs(sdmdata[,4:7], cex=0.1)
 sdmdata<-subset(sdmdata,is.na(bio_1)==F)
 #here we're just removing a couple of rows where the climate data are NAs.
 
-
 specdata<-as.data.frame(cbind(rep("Primula latifola",length(sdmdata[,1])),
                               sdmdata))
 
@@ -116,3 +115,11 @@ backdata<-subset(backdata,presabs==0)
 write.table(specdata[,-4],paste(output_dir,"/Primulalatifola.csv",sep=""),col.names=T,row.names=F,sep=",")
 write.table(backdata[,-4],paste(output_dir,"/background.csv",sep=""),col.names=T,row.names=F,sep=",")
 
+model<-MaxEnt(sdmdata[,-c(1:3)],sdmdata[,3],removeDuplicates=TRUE)
+
+#Here we've used all of the climate variables, but you could be more discerning. 
+#We've also asked the model to ignore any data that comes from the same cell.
+#In the maxent call we first specify the climate data - these are in all the columns except the first one.
+#Next we specify the presence/background data - column1 i.e. [,3]
+
+plot(model)
