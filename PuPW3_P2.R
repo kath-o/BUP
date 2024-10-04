@@ -86,7 +86,33 @@ pb <- c(rep(1, nrow(presvals)), rep(0, nrow(backvals)))
 sdmdata <- data.frame(cbind(lonlats,pb, rbind(presvals, backvals)))
 #here we combine the presence and background data into a single data frame
 
-#In sdmdata the first two columns are climate data and third column contains either a 1 (species present) or 0 (background data). The remaining columns are the corresponding worldclim variables for these location.
+#in sdmdata the first two columns are climate data and third column contains either a 1 (species present) or 0 (background data). The remaining columns are the corresponding worldclim variables for these location.
 
-#We can also examine how colinear (i.e. correlated) predictor variables are. Highly correlated predictor variables can give rise to statistical issues.
+#we can also examine how colinear (i.e. correlated) predictor variables are. Highly correlated predictor variables can give rise to statistical issues.
 pairs(sdmdata[,4:7], cex=0.1)
+#here we just look at the correlations between the first 4 climate variables. You could extend this to look at all 19. 
+
+#fitting a species distribution model 
+#the predicts package in R allows us to fit a whole variety of functions that are useful in running species distribution models. Next we will use it to run the MAXENT approach that has proven very popular.
+sdmdata<-subset(sdmdata,is.na(bio_1)==F)
+#here we're just removing a couple of rows where the climate data are NAs.
+
+
+specdata<-as.data.frame(cbind(rep("Primula latifola",length(sdmdata[,1])),
+                              sdmdata))
+
+names(specdata)[1:4]<-c("species","longitude","latitude","presabs")
+
+specdata<-subset(specdata,presabs==1)
+
+backdata<-as.data.frame(cbind(rep("background",length(sdmdata[,1])),
+                              sdmdata))
+
+names(backdata)[1:4]<-c("","longitude","latitude","presabs")
+
+backdata<-subset(backdata,presabs==0)
+
+
+write.table(specdata[,-4],paste(output_dir,"/Primulalatifola.csv",sep=""),col.names=T,row.names=F,sep=",")
+write.table(backdata[,-4],paste(output_dir,"/background.csv",sep=""),col.names=T,row.names=F,sep=",")
+
