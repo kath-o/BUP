@@ -117,4 +117,58 @@ response<-predict(model,newdata=newdata_bio5,type="response")
 plot(newdata_bio5$bio_5,response,type="l")
 
 
-#4.2 spatial cross validation 
+#4.2 spatial cross validation
+#examine how well model can predict presence/absence
+#we randomly drop a block from the dataset. (2) We then refit the glm to this reduced “training” dataset. (3) Use the climate data in the ring ouzel dataset to obtain a predicted probability of ring ouzel presence. (4) Consider different probability thresholds to generate a ROC curve. (5) Calculate the area under the curve. And then repeat for each of the blocks.
+#In our case there are only 5 spatial blocks, so we will run the cross validation five times and calculate the AUC each time. From these five blocks we can then calculate an average AUC
+
+#first we will exclude spatial block 1.
+training1<-subset(ouzel_df,blockCV_tile!=1)
+#next we re-run the glm
+model1<-glm( Turdus_torquatus ~ bio_2 + I(bio_2^2) + bio_5 + I(bio_5^2) + bio_14 + I(bio_14^2), family='binomial', data=training1)
+#we will then subset the data for a testing dataset and we will see how well the glm fitted to the other data does in predicting presences in this testing block
+testing<-subset(ouzel_df,blockCV_tile==1)
+predicted<-predict(model1,testing,type="response")
+#so here we have a prediction as a proportion rather than as a pres/abs.
+
+#The next step is to take different threshold values (i.e probability values at which we count a species as present or absent)
+thresholds<-seq(0,1,0.001)
+tpr<-c()
+fpr<-c()
+#We will then use a loop to consider the true positive and false positive rate at each threshold value
+for(x in 1:length(thresholds)){
+  
+  predicted.pres<-as.numeric(predicted>thresholds[x])
+  
+  present_correct<-length(which(predicted.pres*testing$Turdus_torquatus==1))
+  present_incorrect<-length(which(testing$Turdus_torquatus-predicted.pres==1))
+  tpr[x]<-present_correct/(present_correct+present_incorrect)
+  
+  absent_correct<-length(which(predicted.pres+testing$Turdus_torquatus==0))
+  absent_incorrect<-length(which(testing$Turdus_torquatus-predicted.pres==-1))
+  fpr[x]<-absent_incorrect/(absent_incorrect+absent_correct)
+  
+}
+
+#When we've run that we can plot the receiver operating characteristic (ROC) curve
+plot(fpr,tpr,xlab="false positive rate, 1-sensitivity",ylab="true positive rate, specificity",type="l")
+abline(0,1,lty=2)
+
+#Finally to calculate AUC, we can imagine lots of small rectangles. For each one we will calculate its areas and then the area under curve is the sum of those
+
+sortedvals<-cbind(fpr,tpr)[order(fpr),]
+
+AUC<-0
+for(x in 2:length(sortedvals[,1])){
+  AUC<-AUC+(sortedvals[x,1]-sortedvals[x-1,1])*sortedvals[x-1,2]}
+
+AUC
+
+#quite a high AUC value, suggesting a good model performance when it comes to predicting ring ouzel presence/absence in another region
+#want to decide on an optimal probability threshold, as we’ll use this for the mapping stage that comes next
+#Here we'll find a value that maximises true positive rate and minimises false positive rate
+bestthreshold<-thresholds[which.max(tpr+(1-fpr))]
+
+bestthreshold
+
+
