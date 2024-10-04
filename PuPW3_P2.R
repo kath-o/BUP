@@ -117,9 +117,26 @@ write.table(backdata[,-4],paste(output_dir,"/background.csv",sep=""),col.names=T
 
 model<-MaxEnt(sdmdata[,-c(1:3)],sdmdata[,3],removeDuplicates=TRUE)
 
-#Here we've used all of the climate variables, but you could be more discerning. 
-#We've also asked the model to ignore any data that comes from the same cell.
-#In the maxent call we first specify the climate data - these are in all the columns except the first one.
-#Next we specify the presence/background data - column1 i.e. [,3]
+#here we've used all of the climate variables, but you could be more discerning. 
+#we've also asked the model to ignore any data that comes from the same cell.
+#in the maxent call we first specify the climate data - these are in all the columns except the first one.
+#next we specify the presence/background data - column1 i.e. [,3]
 
 plot(model)
+
+#We can look at the predicted climate suitability globally, and see how it matches where the species has been recorded (remember with occurrence data no data doesn’t mean it is necessarily absent).
+predictedocc <- predict(model, predictors, args=c("outputformat=raw")) 
+
+par(mfrow=c(2,1))
+plot(predictedocc)
+plot(predictedocc)
+points(occlatlon,pch=".", col="deeppink")
+
+#predicting future distributions 
+#we need to download future climate data
+
+bio_fut<-cmip6_world(model='ACCESS-ESM1-5', ssp='245', time='2041-2060', var='bioc', res=10, path=output_dir)
+
+fut_predictors<-crop(bio_fut,e)
+
+plot(predictors,19)
