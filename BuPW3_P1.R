@@ -67,4 +67,12 @@ plot(bio_fut)
 #3. Model fitting 
 #can you code a binomial GLM with all three predictors fitted as linear and squared terms?
 
+model <- glm( Turdus_torquatus ~ bio_2 + I(bio_2^2) + bio_5 + I(bio_5^2) + bio_14 + I(bio_14^2), family='binomial', data=ouzel_df)
+
+summary(model)
+
+#from the model summary, which variables look to be having an important effect?
+#bio5 
+
+
 
