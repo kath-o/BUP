@@ -74,5 +74,19 @@ summary(model)
 #from the model summary, which variables look to be having an important effect?
 #bio5 
 
+#4 testing and critiquing our model
+#4.1 partial effects 
+#model critique is to understand how each climate variable affects the presence/absence of ring ouzels
+#we will plot the partial effects, i.e. the effects of each variable whilst holding the other variables constant
+#redict function for each variable. In order to use the predict function we will generate a new data frame in which our focal variable varies but the other variables are held constant.
 
+bio_2<-seq(min(ouzel_df$bio_2),max(ouzel_df$bio_2),0.1)
 
+newdata_bio2<-expand.grid(bio_2,mean(ouzel_df$bio_5),mean(ouzel_df$bio_14))
+names(newdata_bio2)<-c("bio_2","bio_5","bio_14")
+#To use predict we need to generate a new dataset. We will set the other two climate variables at their mean.
+
+response<-predict(model,newdata=newdata_bio2,type="response")
+#We've told the predict function to make a prediction on the response scale, ie. in terms of presence/absence
+
+plot(newdata_bio2$bio_2,response,type="l")
