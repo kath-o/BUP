@@ -9,4 +9,5 @@ library(geodata)
 library(predicts)
 library(terra)
 
-#downloading data from GBIF
+#downloading data from GBIF - first 10000
+occdata <- geodata::sp_occurrence("Lagopus", "muta*", geo=FALSE,removeZeros=TRUE,start=1,end=10000)

@@ -45,10 +45,11 @@ bg <- rast('/vsicurl/https://damariszurell.github.io/SDM-Intro/CH_mask.tif')
 
 bio_curr <- terra::project(bio_curr, bg)
 bio_fut <- terra::project(bio_fut, bg)
-#we need to change the projection of our cliamte data to match that of the bg file.
+#we need to change the projection of our climate data to match that of the bg file.
 
 bio_curr <- terra::resample(bio_curr, bg)
 bio_fut <- terra::resample(bio_fut, bg)
+
 #we then need to make the resolution equivalent to bg. 
 
 
