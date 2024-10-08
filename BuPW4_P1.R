@@ -66,12 +66,13 @@ head(sparrow)
 
 #most basic form of the model (the default) estimates constant survival and detection probabilities
 
-mod1 <- crm(sparrow) # capture-mark-recapture (cmr) model
-mod1 # examine model and coefficient estimates
+mod1 <- crm(sparrow) #capture-mark-recapture (cmr) model
+mod1 #examine model and coefficient estimates
 
-mod1 <- cjs.hessian(mod1) # refit model with precision estimates
+mod1 <- cjs.hessian(mod1) #refit model with precision estimates
 
-#As with a binomial GLM, these estimates are on the latent (logit) scale. We can transform them back to the data scale using the plogis() or predict() functions. The estimates on the data scale are also stored within the results section of the model under ‘reals
+#as with a binomial GLM, these estimates are on the latent (logit) scale. We can transform them back to the data scale using the plogis() or predict() functions
+#the estimates on the data scale are also stored within the results section of the model under ‘reals
 
 mod1$results$reals
 
@@ -81,5 +82,26 @@ plogis(mod1$results$beta$p)
 
 predict(mod1, newdata=data.frame(sex = c('Female', 'Male')), se=T) # N.b. In this case, there are no groups or covariates in the model and so the 'newdata' argument is not used
 
-#robability of surviving between capture events was therefore 0.518, and the probability of detecting an animal during a capture event was 0.580
+#probability of surviving between capture events was therefore 0.518, and the probability of detecting an animal during a capture event was 0.580
+
+#unequal sampling intervals 
+#model assumes an equal time between each capture event
+#this assumption can be relaxed by including a vector of time intervals
+
+mod2 <- crm(sparrow, time.intervals = c(1,2,1,1,1,1,1,3,4))
+mod2$results$reals
+
+#QUESTIONS: These models assumed constant survival rates and detection probabilities. 
+#Is this a realistic assumption for this system? 
+#no; both can fluctuate 
+#What term might you include in the model next, and why?
+#...
+
+#including static covariates
+#islands in the meta-population are all different, and it is possible that the probability of capturing an individual differs between islands
+#test this by adding some additional complexity to our model and allowing the detection probability to vary between islands
+
+
+
+
 
