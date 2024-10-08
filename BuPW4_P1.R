@@ -48,5 +48,14 @@ temp <- temp %>%
 sparrow <- as.data.frame(temp) # new dataframe called sparrow
 head(sparrow)
 
+#add back some information based on the individual ids using the match() function
+sparrow$island <- longdata$island[match(sparrow$id, longdata$id)] 
+#this creates a new column called island in the sparrow df...
+#using the entry from the island column in the longdata df... 
+#where id in the sparrow df matches the id in the longdata df
 
+sparrow$sex <- as.factor(longdata$sex[match(sparrow$id, longdata$id)])
+
+sparrow <- droplevels(subset(sparrow, select = -id)) # remove id column so capture histories appear in first column
+head(sparrow)
 
