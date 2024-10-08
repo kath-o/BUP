@@ -101,7 +101,103 @@ mod2$results$reals
 #islands in the meta-population are all different, and it is possible that the probability of capturing an individual differs between islands
 #test this by adding some additional complexity to our model and allowing the detection probability to vary between islands
 
+sparrow.proc <- process.data(sparrow) # built in function for data processing
+str(sparrow.proc)
 
+head(sparrow.proc[[1]])
+head(sparrow.proc$data)
 
+sparrow.ddl <- make.design.data(sparrow.proc) # built in function for building design matrix 
+str(sparrow.ddl)
+head(sparrow.ddl[[1]])
+head(sparrow.ddl$Phi)
 
+#can then specify the model formulation for the detection probability model, making p dependent on island
+#we run the CMR model using our newly processed data, our design matrix, and our model specification
+
+# specify model formulation: capture probability depends on island
+p.island <- list(formula=~island) 
+
+mod3 <- crm(sparrow.proc, 
+            sparrow.ddl, 
+            model.parameters = list(p = p.island), 
+            accumulate=FALSE, hessian = TRUE)
+mod3$results$reals
+
+#Does it look like detection probability varies among islands? 
+#Which island has the lowest detection probability? 
+#Why might this be? 
+#How might you compare this model with our simpler model above to see if it is a better fit?
+
+(mod3$results$AIC)
+(mod1$results$AIC)
+
+#lower AIC values indicate a better fitting model, so we accept the model with varying detection probabilities
+
+#test whether survival probabilities differ between the islands
+parrow.proc <- process.data(sparrow) 
+sparrow.ddl <- make.design.data(sparrow.proc) 
+
+Phi.island <- list(formula=~island) # survival probability depends on island
+p.island <- list(formula=~island) # capture probability depends on island
+
+mod4 <- crm(sparrow.proc, 
+            sparrow.ddl, 
+            model.parameters = list(Phi = Phi.island, 
+                                    p = p.island), 
+            accumulate=FALSE, hessian = TRUE)
+
+mod4$results$reals
+(mod4$results$AIC)
+(mod3$results$AIC)
+
+#AIC value of the new model is slightly higher, indicating that including this extra term does not improve model fit. We therefore find no evidence that survival rates vary among islands.
+
+#Does survival probability vary between the sexes?
+#test a few different model structures for both survival and detection components
+#use a wrapper function 
+
+sparrow.proc <- process.data(sparrow)
+sparrow.ddl <- make.design.data(sparrow.proc)
+
+fit.models <- function() {
+  Phi.dot <- list(formula=~1) # constant survival
+  Phi.sex <- list(formula=~sex) # survival differs between sexes
+  Phi.island <- list(formula=~island) # survival differs between islands
+  Phi.sex.island <- list(formula=~sex+island) # survival differs between sexes and islands
+  p.dot <- list(formula=~1) # constant detection
+  p.sex <- list(formula=~sex) # detection probability differs between sexes
+  p.island <- list(formula=~island) # detection probability differs between islands
+  p.sex.island <- list(formula=~sex+island) # detection probability differs between sexes and islands
+  cml <- create.model.list(c("Phi","p"))
+  results <- crm.wrapper(cml, data=sparrow.proc, ddl=sparrow.ddl,
+                         external=FALSE, accumulate=FALSE, hessian=TRUE)
+  return(results)
+}
+
+sparrow.models <- fit.models() # run function
+sparrow.models # display model table
+
+#top model (with the lowest AIC value) includes a constant model for survival probability with detection probabilities differing among islands
+#there are a number of models with very similar AIC scores, indicating a similar level of support
+#AIC differences of less than 2 are not considered to be meaningfully different and so in this case we accept the simplest model - that with the fewest parameters
+
+#In this case, that is the top model. We can extract and plot the different detection probabilities as follows.
+
+mod5 <- sparrow.models[[2]]
+
+ggplot(mod5$results$reals$p, aes(island, estimate, ymin=lcl, ymax=ucl)) + 
+  geom_errorbar(width=0.2) + geom_point() + ylim(0,1)
+
+#extract the sex and island differences in survival from the similarly supported models and plot those to convince ourselves that there aren’t big differences
+
+mod6 <- sparrow.models[[10]]
+ggplot(mod6$results$reals$Phi, aes(sex, estimate, ymin=lcl, ymax=ucl)) + 
+  geom_errorbar(width=0.2) + geom_point() + ylim(0,1)
+
+mod7 <- sparrow.models[[6]]
+ggplot(mod7$results$reals$Phi, aes(island, estimate, ymin=lcl, ymax=ucl)) + 
+  geom_errorbar(width=0.2) + geom_point() + ylim(0,1)
+
+#including time-varying covariates 
 
