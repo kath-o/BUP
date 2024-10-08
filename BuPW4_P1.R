@@ -17,3 +17,7 @@ head(longdata)
 #ata are in what is known as ‘long format’, with individuals appearing in multiple rows representing each occasion they were captured
 #simple data exploration
 
+length(unique(longdata$id)) # the number of unique individuals in the dataframe
+table(longdata$sex) # equal number of observations of males and females
+table(longdata$year) # captures from 1998-2007
+table(longdata$island) # at 4 different island locations
