@@ -59,3 +59,27 @@ sparrow$sex <- as.factor(longdata$sex[match(sparrow$id, longdata$id)])
 sparrow <- droplevels(subset(sparrow, select = -id)) # remove id column so capture histories appear in first column
 head(sparrow)
 
+#Simple Cormack-Jolly-Seber model
+#estimates apparent survival (Phi) and detection probability (p) for open populations
+#each of these is a linear model on the logit scale (bound between 0 and 1)
+#CJS model uses information from capture histories where individuals were marked, not observed, and subsequently seen at a later date to estimate detection probabilities
+
+#most basic form of the model (the default) estimates constant survival and detection probabilities
+
+mod1 <- crm(sparrow) # capture-mark-recapture (cmr) model
+mod1 # examine model and coefficient estimates
+
+mod1 <- cjs.hessian(mod1) # refit model with precision estimates
+
+#As with a binomial GLM, these estimates are on the latent (logit) scale. We can transform them back to the data scale using the plogis() or predict() functions. The estimates on the data scale are also stored within the results section of the model under ‘reals
+
+mod1$results$reals
+
+plogis(mod1$results$beta$Phi)
+
+plogis(mod1$results$beta$p)
+
+predict(mod1, newdata=data.frame(sex = c('Female', 'Male')), se=T) # N.b. In this case, there are no groups or covariates in the model and so the 'newdata' argument is not used
+
+#robability of surviving between capture events was therefore 0.518, and the probability of detecting an animal during a capture event was 0.580
+
