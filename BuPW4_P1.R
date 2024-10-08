@@ -17,7 +17,36 @@ head(longdata)
 #ata are in what is known as ‘long format’, with individuals appearing in multiple rows representing each occasion they were captured
 #simple data exploration
 
-length(unique(longdata$id)) # the number of unique individuals in the dataframe
-table(longdata$sex) # equal number of observations of males and females
-table(longdata$year) # captures from 1998-2007
-table(longdata$island) # at 4 different island locations
+length(unique(longdata$id)) #the number of unique individuals in the dataframe
+table(longdata$sex) #equal number of observations of males and females
+table(longdata$year) #captures from 1998-2007
+table(longdata$island) #at 4 different island locations
+
+#marked requires capture histories to be in 'wide' format
+#each row representing one individual
+#capture history forms string of 1s and 0s, no spaces, 1 for each capture and 0 where individual isn't detected 
+#all histories should have the same number of entrues and therefore be the same length
+#should appear in the first column of the dataframe which must be named ‘ch’
+#following code uses pipes (%>%) and the spread(), unite() and group_by() functions from the tidyr and dplyr packages to generate the appropriate format
+
+temp <- longdata[,1:2] #take the first two columns, id and year and put into a temporary dataframe
+temp$detect <- 1 #add column for detection (all 1s because these represent captures) 
+
+temp <- temp %>%
+  #remove duplicates, which may occur when individuals are caught multiple times in an sampling event
+  distinct() %>%
+  #spread out data. The fill = 0 adds rows for combinations of id and year where individuals were not observed
+  spread(year, detect, fill = 0) %>% 
+  #for every individual....
+  group_by(id) %>%
+  #paste together 0's and 1's using unite()
+  #here we are pasting the strings together from the second column (first capture event)
+  #to the last capture event ("tail(names(.),1)")
+  #use sep="" so there are no characters separating 0's and 1's
+  unite("ch", 2:tail(names(.),1), sep = "")
+
+sparrow <- as.data.frame(temp) # new dataframe called sparrow
+head(sparrow)
+
+
+
