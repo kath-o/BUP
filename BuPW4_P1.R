@@ -8,3 +8,12 @@ library(tidyr)
 library(marked)
 library(ggplot2)
 library(R2ucare)
+
+#load the sparrow recapture dataset
+longdata <- read.table("~/Desktop/MSc EEB/WD/BUP/CMR practical/sparrowrecap.txt", header = TRUE, sep = '\t')
+head(longdata)
+
+#dataset consists of n=2378 capture observations across different islands in the house sparrow meta-population
+#ata are in what is known as ‘long format’, with individuals appearing in multiple rows representing each occasion they were captured
+#simple data exploration
+
