@@ -110,3 +110,14 @@ ggplot(projected, aes(time, N)) +
 
 #this tells us the population is projected to increase over time since lambda > 1
 
+#observed dynamics 
+#we can compare this with estimated population counts (N) over the 15 study years, saved in 'popest.txt'
+
+popest <- read.table("~/Desktop/MSc EEB/WD/BUP/MPM practical/popest.txt", header = TRUE, sep = '\t')
+head(popest)
+
+# plot N over time
+ggplot(popest, aes(year, N)) + 
+  geom_line() + ylim(0,200) + ylab('Observed N')
+
+#stable stage distribution and reproductive value
