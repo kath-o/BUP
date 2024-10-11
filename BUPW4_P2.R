@@ -133,3 +133,27 @@ stable.stage(sparrowMPM)
 
 reproductive.value(sparrowMPM)
 
+#could potentially compare the stable stage distribution with what we observed based on the recapture data to tell us something about the performance of our model 
+
+#perturbation analysis 
+#popbio also includes built-in functions to calculate the sensitivities and elasticities of the different vital rates 
+#these tell us about the relative importance of each vital rate in determining the population growth rate, lambda
+#sensitivities estimate the change in lambda for an absolute change in a vital rate 
+#elasticities tell us about the effect of a proportional change 
+
+# list the vital rates
+sparrow.param <- list(Phi.juv = Phi.juv, Phi.yr = Phi.yr, Phi.ad = Phi.ad, R = R)
+
+# give the matrix equation 
+sparrow.equation <- expression(Phi.juv * R, Phi.yr * R, Phi.ad * R, Phi.juv, 0, 0, 0, Phi.yr, Phi.ad)
+
+# run the sensitivity analysis
+sens <- vitalsens(sparrow.equation, sparrow.param)
+sens
+
+# plot elasticity of the vital rates 
+sens$vitalrate <- factor(c('Phi.juv', 'Phi.yr', 'Phi.ad', 'R'), levels = c('Phi.juv', 'Phi.yr', 'Phi.ad', 'R'))
+ggplot(sens, aes(vitalrate, elasticity)) + 
+  geom_bar(stat = 'identity') 
+
+
