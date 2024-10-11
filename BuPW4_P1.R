@@ -200,4 +200,106 @@ ggplot(mod7$results$reals$Phi, aes(island, estimate, ymin=lcl, ymax=ucl)) +
   geom_errorbar(width=0.2) + geom_point() + ylim(0,1)
 
 #including time-varying covariates 
+#might want to test whether survival (or detection) probabilities differ depending on a factor that varies over time, such as some aspect of the weather
+#add a variable ‘cold’ to the design data (sparrow.ddl) and test whether it being an extra-cold winter affects survival
+
+sparrow.ddl$Phi$cold <- "Cold" # new column 
+sparrow.ddl$Phi$cold[sparrow.ddl$Phi$time==2 | sparrow.ddl$Phi$time==5 | sparrow.ddl$Phi$time==8] <- "VeryCold" # very cold winters between capture events 2 and 3, 5 and 6, and 8 and 9
+
+head(sparrow.ddl$Phi)
+
+Phi.cold <- list(formula=~cold) 
+p.island <- list(formula=~island) 
+
+mod8 <- crm(sparrow.proc, 
+            sparrow.ddl, 
+            model.parameters = list(Phi = Phi.cold, 
+                                    p = p.island), 
+            accumulate=FALSE, hessian = TRUE)
+
+mod8$results$reals
+(mod8$results$AIC)
+(mod5$results$AIC)
+
+ggplot(mod8$results$reals$Phi, aes(cold, estimate, ymin=lcl, ymax=ucl)) + 
+  geom_errorbar(width=0.2) + geom_point() + ylim(0,1)
+
+#model including an effect of cold on survival probability has a higher AIC, so there is no evidence that survival varied depending on our made-up variable
+
+#time varying survival and recapture probabilities
+# we can test whether survival and detection probabilities varied each year of the study period using the built-in time variable
+
+sparrow.proc <- process.data(sparrow)
+sparrow.ddl <- make.design.data(sparrow.proc)
+
+fit.models <- function() {
+  Phi.dot <- list(formula=~1) # constant survival
+  Phi.time <- list(formula=~time) # survival varies over time
+  p.island <- list(formula=~island) # detection probability differs between islands
+  p.time <- list(formula=~time) # detection probability varies over time
+  p.island.time <- list(formula=~island+time) # detection probability varies over time
+  cml <- create.model.list(c("Phi","p"))
+  results <- crm.wrapper(cml, data=sparrow.proc, ddl=sparrow.ddl,
+                         external=FALSE, accumulate=FALSE, hessian=TRUE)
+  return(results)
+}
+
+sparrow.models <- fit.models() # run function 
+
+sparrow.models # display model table
+
+mod9 <- sparrow.models[[2]]
+
+(mod9$results$AIC)
+(mod5$results$AIC)
+
+ggplot(mod9$results$reals$p, aes(time, estimate, ymin=lcl, ymax=ucl, col=island)) + 
+  geom_errorbar(width=0) + geom_point() + ylim(0,1)
+
+#seems that detection probabilities varied over time
+
+#Goodness-of-fit tests
+#test whether our data violate any of the basic assumptions of the CJS model, we can use the package R2ucare
+#package contains functions to perform goodness-of-fit tests for CMR models
+#this package will test whether our data violate the ‘equal detection assumption’ or the ‘equal survival assumption’
+#we need to reformat the data into a matrix
+
+sparrow.gof <- sparrow$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(sparrow))
+
+#R2ucare perfroms three tests, which are unhelpfully called Tests 1, 2 and 3.
+#* Test 1: the overall test. Overall, is there evidence that animals have equal detection probabilities and equal survival?
+#* Test 2: Does recapture depend on when an animal was first marked? (Tests the equal detection assumption)
+#* Test 3: Does marking affect survival? (Tests the equal survival assumption)
+
+overall_CJS(sparrow.gof, rep(1,nrow(sparrow)))
+
+#The p-value is not significant, meaning we fail to reject the null hypothesis. There is therefore no strong evidence for overall lack-of-fit
+
+#If we found evidence of lack-of-fit, we would want to delve deeper to find out what the problem was. First, we can look at the equal detection assumption using Test 2, which has two components:
+#* Test 2 CT: Is there a difference in p at t+1 between those captured and not captured at t (when animals are known to be alive because are captured later in the study)?
+#* Test 2 CL: Is there a difference in the expected time of next recapture between individuals captured and not captured at t when animals are known to be alive?
+
+test2ct <- test2ct(sparrow.gof, rep(1,nrow(sparrow))) 
+test2ct
+
+#Again, we fail to reject the null hypothesis, so no evidence of a problem with the equal detection assumption.
+
+#Finally, Test 3 which tests the equal survival assumption and also has two components:
+#* Test 3 SR: Do individuals with previous marks have different survival rates than first-time captures?
+#* Test 3 SM: For animals seen again, does when they are recaptured depend on whether they were marked on or before t?
+
+test3sr <- test3sr(sparrow.gof, rep(1,nrow(sparrow)))
+test3sr  
+  
+test3sm <- test3sm(sparrow.gof, rep(1,nrow(sparrow)))
+test3sm
+
+#If your data violate the assumptions, you might need to increase the complexity of your model by adding age classes, including a time-varying individual covariate, or building a multistate or multievent model.
+
 
