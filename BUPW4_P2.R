@@ -60,7 +60,53 @@ ClutchNo <- mean(nests$numberofclutches)
 (ClutchNo * HatchingSuc * FledglingNo) / 2
 
 #deterministic population model 
+#parameterise a deterministic model
+#need a 3x3 matrix with the fertility transitions along the top row, and the survival transitions on the subsequent rows 
 
+# save our estimates of the vital rates
+R <- (ClutchNo * HatchingSuc * FledglingNo) / 2
+Phi.juv <- survival$estimate[survival$stage=='Juvenile'] 
+Phi.yr <- survival$estimate[survival$stage=='Yearling'] 
+Phi.ad <- survival$estimate[survival$stage=='Adult'] 
 
+# remind ourselves how these relate to the transition probabilities of the matrix (see slides)
+# Juvenile to Juvenile: Phi.juv * R
+# Yearling to Juvenile: Phi.yr * R
+# Adult to Juvenile: Phi.ad * R
+# Juvenile to Yearling: Phi.juv
+# Yearling to Yearling: 0 
+# Adult to Yearling: 0 
+# Juvenile to Adult: 0
+# Yearling to Adult: Phi.yr
+# Adult to Adult: Phi.ad
 
+# put the transition probabilities into a vector 
+sparrowMPM <- c(Phi.juv * R, Phi.yr * R, Phi.ad * R, Phi.juv, 0, 0, 0, Phi.yr, Phi.ad)
+
+# save that vector as a matrix, specifying the number of rows and columns
+# use the byrow=TRUE argument to tell R that the first the elements of the vector correspond to the first row of the matrix 
+sparrowMPM <- matrix(sparrowMPM, nrow=3, ncol=3, byrow=T)
+sparrowMPM
+
+#can now use the popbio package to do some analyses of our deterministic MPM
+#for example, we can look at the population growth rate, lambda 
+
+lambda(sparrowMPM) #1.033401
+
+#we can project the dynamics over a given number of iterations (t) based on our matrix and a starting population (n0).
+
+# project over 15 years
+t <- 15
+# start with 50 juveniles, 20 yearlings and 30 adults
+n0 <- c(50,20,30)
+
+# project dynamics 
+projection <- pop.projection(sparrowMPM, n0, iterations = t)
+projected <- data.frame(time=1:15, N=projection$pop.sizes)
+
+# plot projected pop size over time
+ggplot(projected, aes(time, N)) + 
+  geom_line() + ylim(0,150) + ylab('Projected N')
+
+#this tells us the population is projected to increase over time since lambda > 1
 
