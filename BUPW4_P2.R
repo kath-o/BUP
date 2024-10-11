@@ -121,3 +121,15 @@ ggplot(popest, aes(year, N)) +
   geom_line() + ylim(0,200) + ylab('Observed N')
 
 #stable stage distribution and reproductive value
+#popbio has built in functions for other analyses of the asymptotic dynamics of our matrix
+#we can look at the stable stage distribution of our population, that is the long term average relative abundance of different stage classes 
+#reproductive values of the different stage classes, that is the expected contribution of each individual in that stage class to future reproduction 
+
+stages <- c('Juv','Yr','Ad')
+colnames(sparrowMPM) <- stages
+rownames(sparrowMPM) <- stages
+
+stable.stage(sparrowMPM)
+
+reproductive.value(sparrowMPM)
+
