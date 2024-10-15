@@ -111,4 +111,36 @@ ggplot()+
   geom_vline(xintercept=0,color="darkgrey") +
   labs(x = "Prey population", y = "Prey consumed")
 
+#include a type II functional response in your implementation of the Lotka-Volterra model
+LV.fr <- function(t,state,parameters){
+  with(as.list(c(state, parameters)),{
+    # rate of change
+    dX <- a*X - b*X*Y/(1+A*X)
+    dY <- c*X*Y/(1+A*X) - d*Y
+    
+    # return the rate of change
+    list(c(dX, dY))
+  }) # end with(as.list ...
+}
+
+parameters <- c(a=0.1, b=0.02, c=0.02, d=0.4, A=0.02)
+state <- c(X=10, Y=10)
+times <- seq(0,500,by=0.01)
+out <- ode(y=state, times = times, func = LV.fr, parms = parameters)
+out.df <- data.frame(out)
+
+ggplot(data = out.df)+
+  geom_line(mapping=aes(x=time,y=X),color="darkolivegreen") +
+  geom_line(mapping=aes(x=time,y=Y),color="maroon") +
+  geom_hline(yintercept=0,color="darkgrey") +
+  geom_vline(xintercept=0,color="darkgrey") +
+  labs(x = "Time", y = "P")
+
+ggplot(data = out.df)+
+  geom_path(mapping=aes(x=X,y=Y),color="hotpink1") +
+  xlim(0,270) +
+  ylim(0,150) +
+  geom_hline(yintercept=0,color="darkgrey") +
+  geom_vline(xintercept=0,color="darkgrey") +
+  labs(x = "Prey", y = "Predator")
 
