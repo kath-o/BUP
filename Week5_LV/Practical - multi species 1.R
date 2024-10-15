@@ -182,8 +182,6 @@ ggplot(data = out.df)+
   labs(x = "Prey", y = "Predator")
 
 
-
-
 #################
 ##Competition##
 #################

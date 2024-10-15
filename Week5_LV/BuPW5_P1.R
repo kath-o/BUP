@@ -1,3 +1,11 @@
+rm(list=ls())
+gc()
+graphics.off()
+
+library(tidyverse)
+library(ggplot2)
+library(deSolve)
+
 #the predator-prey lotka-volterra model
 #implementation of the base LV model
 
@@ -143,4 +151,47 @@ ggplot(data = out.df)+
   geom_hline(yintercept=0,color="darkgrey") +
   geom_vline(xintercept=0,color="darkgrey") +
   labs(x = "Prey", y = "Predator")
+
+#combine both the logistic growth and the functional response in your Lotka-Volterra model
+
+x <- seq(0,30,0.1)
+A <- 0.1
+y <- x/(1+A*x)
+ggplot()+
+  geom_line(mapping=aes(x=x,y=y),color="darkslategrey") +
+  geom_hline(yintercept=0,color="darkgrey") +
+  geom_vline(xintercept=0,color="darkgrey") +
+  labs(x = "Prey population", y = "Prey consumed")
+
+LV.lg.fr <- function(t,state,parameters){
+  with(as.list(c(state, parameters)),{
+    # rate of change
+    dX <- a*X*(1-X/K) - b*X*Y/(1+A*X)
+    dY <- c*X*Y/(1+A*X) - d*Y
+    
+    # return the rate of change
+    list(c(dX, dY))
+  }) # end with(as.list ...
+}
+
+parameters <- c(a=0.1, b=0.02, c=0.02, d=0.4, K=30, A=0.01)
+state <- c(X=10, Y=10)
+times <- seq(0,500,by=0.01)
+out <- ode(y=state, times = times, func = LV.lg.fr, parms = parameters)
+out.df <- data.frame(out)
+
+
+ggplot(data = out.df)+
+  geom_line(mapping=aes(x=time,y=X),color="darkolivegreen") +
+  geom_line(mapping=aes(x=time,y=Y),color="maroon") +
+  geom_hline(yintercept=0,color="darkgrey") +
+  geom_vline(xintercept=0,color="darkgrey") +
+  labs(x = "Time", y = "P")
+
+
+
+
+
+
+#three-species competition Lotka-Volterra model: limiting similarity
 
