@@ -38,6 +38,7 @@ out.df <- data.frame(out)
 #plotting the output 
 install.packages("ggplot")
 library(ggplot2)
+
 ggplot(data = out.df)+
   geom_line(mapping=aes(x=time,y=X),color="darkolivegreen") +
   geom_line(mapping=aes(x=time,y=Y),color="maroon") +
@@ -45,4 +46,13 @@ ggplot(data = out.df)+
   geom_vline(xintercept=0,color="darkgrey") +
   labs(x = "Time", y = "P")
 
+#plotting the changes in populations through time in phase space 
+
+ggplot(data = out.df)+
+  geom_path(mapping=aes(x=X,y=Y),color="hotpink1") +
+  xlim(0,70) +
+  ylim(0,40) +
+  geom_hline(yintercept=0,color="darkgrey") +
+  geom_vline(xintercept=0,color="darkgrey") +
+  labs(x = "Prey", y = "Predator")
 
