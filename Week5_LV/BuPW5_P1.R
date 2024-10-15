@@ -29,7 +29,7 @@ LV <- function(t,state,parameters){
 }
 
 
-parameters <- c(a=0.1, b=0.02, c=0.02, d=0.4)
+parameters <- c(a=0.05, b=0.025, c=0.025, d=0.2)
 state <- c(X=10, Y=10)
 times <- seq(0,500,by=0.01)
 out <- ode(y=state, times = times, func = LV, parms = parameters)
@@ -56,3 +56,41 @@ ggplot(data = out.df)+
   geom_vline(xintercept=0,color="darkgrey") +
   labs(x = "Prey", y = "Predator")
 
+#when all parameters increased, phase space circle is smaller 
+#when all parameters decresed, phase space larger and less circular 
+
+#prey growth rate: exponential vs logistic 
+#in the original LV model, prey growth rate is exponential in absence of predator 
+#change the equation to include a logistic growth instead 
+
+LV.lg <- function(t,state,parameters){
+  with(as.list(c(state, parameters)),{
+    # rate of change
+    dX <- a*X*(1-X/K) - b*X*Y
+    dY <- c*X*Y - d*Y
+    
+    # return the rate of change
+    list(c(dX, dY))
+  }) # end with(as.list ...
+}
+
+parameters <- c(a=0.1, b=0.02, c=0.02, d=0.4, K=30)
+state <- c(X=10, Y=10)
+times <- seq(0,500,by=0.01)
+out <- ode(y=state, times = times, func = LV.lg, parms = parameters)
+out.df <- data.frame(out)
+
+ggplot(data = out.df)+
+  geom_line(mapping=aes(x=time,y=X),color="darkolivegreen") +
+  geom_line(mapping=aes(x=time,y=Y),color="maroon") +
+  geom_hline(yintercept=0,color="darkgrey") +
+  geom_vline(xintercept=0,color="darkgrey") +
+  labs(x = "Time", y = "P")
+
+ggplot(data = out.df)+
+  geom_path(mapping=aes(x=X,y=Y),color="hotpink1") +
+  xlim(0,70) +
+  ylim(0,40) +
+  geom_hline(yintercept=0,color="darkgrey") +
+  geom_vline(xintercept=0,color="darkgrey") +
+  labs(x = "Prey", y = "Predator")
