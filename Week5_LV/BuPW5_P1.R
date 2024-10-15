@@ -94,3 +94,21 @@ ggplot(data = out.df)+
   geom_hline(yintercept=0,color="darkgrey") +
   geom_vline(xintercept=0,color="darkgrey") +
   labs(x = "Prey", y = "Predator")
+
+#incorporating functional response 
+#at some point predators will not be able to increase their prey intake further 
+#the rate at which predators can consume prey is called functional response 
+#three types of functional response, including the liner one (type I) that is captured by terms in the original LV equations 
+#A controls the slope of the functional response - high value indicates poor pred hunting efficiency
+
+#A <- 0.005
+A <- 0
+x <- seq(0,30,0.1)
+y <- x/(1+A*x)
+ggplot()+
+  geom_line(mapping=aes(x=x,y=y),color="darkslategrey") +
+  geom_hline(yintercept=0,color="darkgrey") +
+  geom_vline(xintercept=0,color="darkgrey") +
+  labs(x = "Prey population", y = "Prey consumed")
+
+
