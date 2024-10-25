@@ -14,9 +14,9 @@
 # secondary infections per host
 
 # input parameters - YOU CAN VARY THESE
-R0 <- 1.5   # mean number of secondary infections per host
-var.par <- 0   # parameter controlling variation amongst hosts
-num.draws <- 1  # number of hosts to sample
+R0 <- 2   # mean number of secondary infections per host
+var.par <- 100   # parameter controlling variation amongst hosts
+num.draws <- 1000  # number of hosts to sample
 
 # randomly draw the number of secondary infections per host 
 # from a negative binomial distribution (see Lloyd-Smith et al. 2005)
@@ -67,18 +67,18 @@ outbreak <- outbreak_sim(R0,var.par,max.gens,max.N)
 # Newly infected hosts over time (infection generations)
 # linear scale
 plot(0:max.gens,0:max.gens,type="n",ylim=c(0,max(outbreak$num.inf)+1),xlab="infection generation",ylab="number of infected hosts")
-lines(0:(outbreak$num.gens-1),outbreak$num.inf,type="s",lwd=4,col='red')
+lines(0:(outbreak$num.gens-1),outbreak$num.inf,type="s",lwd=4,col='indianred')
 # log scale
 plot(0:max.gens,0.01+0:max.gens,log="y",type="n",ylim=c(0.9,max(outbreak$num.inf)+1),xlab="infection generation",ylab="number of infected hosts")
-lines(0:(outbreak$num.gens-1),outbreak$num.inf+0.01,type="s",lwd=4,col='red')
+lines(0:(outbreak$num.gens-1),outbreak$num.inf+0.01,type="s",lwd=4,col='plum4')
 
 # Cumulative number of infected hosts over time (infection generations)
 # linear scale
 plot(0:max.gens,0:max.gens,type="n",ylim=c(0,max(outbreak$cumul.inf)+1),xlab="infection generation",ylab="cumulative number of infected hosts")
-lines(0:(outbreak$num.gens-1),outbreak$cumul.inf,type="s",lwd=4,col='red')
+lines(0:(outbreak$num.gens-1),outbreak$cumul.inf,type="s",lwd=4,col='darkolivegreen4')
 # log scale
 plot(0:max.gens,0.01+0:max.gens,log="y",type="n",ylim=c(0.9,max(outbreak$cumul.inf)+1),xlab="infection generation",ylab="cumulative number of infected hosts")
-lines(0:(outbreak$num.gens-1),outbreak$cumul.inf+0.01,type="s",lwd=4,col='red')
+lines(0:(outbreak$num.gens-1),outbreak$cumul.inf+0.01,type="s",lwd=4,col='aquamarine4')
 
 
 ### (b) Generate a set of simulated outbreaks with given parameters and calculate summary statistics
