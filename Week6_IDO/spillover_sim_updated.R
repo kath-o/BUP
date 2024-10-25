@@ -46,16 +46,15 @@ source("outbreak_sim_function.R")
 
 # INPUTS - (YOU CAN VARY THESE)
 # Main input parameters - defining distribution of secondary infections, as in Exercise 1
-R0 <- 1.5   # mean number of secondary infections per host
-var.par <- 0   # parameter controlling variation amongst hosts
+R0 <- 4   # mean number of secondary infections per host
+var.par <- 5 # parameter controlling variation amongst hosts
 # Additional input parameters - simulation settings
-max.gens <- 20  # maximum number of infection generations to simulate
+max.gens <- 100  # maximum number of infection generations to simulate
 max.N <- 1000   # max number of infected hosts (in one generation) to simulate
 
 # SIMULATE ONE OUTBREAK
 # Call the simulation function:
-outbreak <- outbreak_sim(R0,var.par,max.gens,max.N)
-# returns a list containing three elements:
+outbreak <- outbreak_sim(R0,var.par,max.gens,max.N) # returns a list containing three elements:
   # num.inf (vector): the number of newly infected hosts in each infection generation
   # cumul.inf (vector): the cumulative number of infected hosts in the outbreak, up to each generation
   # num.gens (scalar): the number of generations simulated, including the first with the initial infected host
@@ -67,7 +66,7 @@ outbreak <- outbreak_sim(R0,var.par,max.gens,max.N)
 # Newly infected hosts over time (infection generations)
 # linear scale
 plot(0:max.gens,0:max.gens,type="n",ylim=c(0,max(outbreak$num.inf)+1),xlab="infection generation",ylab="number of infected hosts")
-lines(0:(outbreak$num.gens-1),outbreak$num.inf,type="s",lwd=4,col='indianred')
+lines(0:(outbreak$num.gens-1),outbreak$num.inf,type="s",lwd=4,col='indianred4')
 # log scale
 plot(0:max.gens,0.01+0:max.gens,log="y",type="n",ylim=c(0.9,max(outbreak$num.inf)+1),xlab="infection generation",ylab="number of infected hosts")
 lines(0:(outbreak$num.gens-1),outbreak$num.inf+0.01,type="s",lwd=4,col='plum4')
